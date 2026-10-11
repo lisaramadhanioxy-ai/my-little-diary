@@ -1,0 +1,704 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#fff9ef">
+<title>My Little Diary — Cozy World</title>
+<style>
+:root{
+  --blue:#c8e6f5;--yellow:#ffe8a3;--orange:#ffc99f;
+  --cream:#fff9ef;--pink:#f6dce3;--ink:#625d59;
+  --green:#c9dfbd;--white:#fffefa;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--cream);color:var(--ink);
+  font-family:"Trebuchet MS",system-ui,sans-serif;
+  background-image:radial-gradient(#e8dcca 0.7px,transparent .7px);
+  background-size:15px 15px;
+}
+button,input,textarea,select{font:inherit;color:inherit}
+button{
+  border:0;border-radius:16px;padding:10px 14px;
+  background:var(--blue);cursor:pointer;transition:.2s;
+}
+button:active{transform:scale(.96)}
+button:hover{filter:brightness(.97)}
+header{
+  max-width:1000px;margin:auto;padding:22px 18px 10px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.logo{font-size:23px;font-weight:900;letter-spacing:-1px}
+.logo span{display:block;font-size:11px;font-weight:500;letter-spacing:1px;margin-top:3px}
+.pill{background:white;border:1px solid #eee4d7;border-radius:30px;padding:9px 12px;font-size:12px}
+nav{
+  display:flex;gap:8px;padding:8px 16px 16px;
+  max-width:1000px;margin:auto;overflow-x:auto;
+}
+nav button{white-space:nowrap;background:white;border:1px solid #eee5d9}
+nav button.active{background:var(--yellow);border-color:transparent}
+main{max-width:1000px;margin:auto;padding:0 16px 40px}
+.page{display:none}.page.active{display:block}
+.panel{
+  background:rgba(255,254,250,.96);border:1px solid #eee5d9;
+  border-radius:24px;padding:18px;margin-bottom:16px;
+  box-shadow:0 6px 22px #85745c0b;
+}
+h1,h2,h3,p{margin-top:0}
+h1{font-size:clamp(24px,5vw,36px);letter-spacing:-1px;margin-bottom:8px}
+h2{font-size:19px;margin-bottom:8px}
+h3{font-size:15px}
+.muted{color:#999087;font-size:13px;line-height:1.6}
+.hero{
+  background:linear-gradient(125deg,#d8edfa,#fff0c3 68%,#ffe0c8);
+  border-radius:28px;padding:25px 22px;margin-bottom:16px;
+}
+.hero p{max-width:500px;line-height:1.65}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row>*{flex:1}
+.field{display:block;width:100%;border:1px solid #e9dfd3;background:#fffefa;border-radius:14px;padding:12px;margin:8px 0 14px;outline:none}
+.field:focus{border-color:#a9cddd}
+textarea.field{resize:vertical;min-height:110px}
+label{font-size:12px;font-weight:700}
+.mood{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.mood button{background:#f5eee5;flex:1;min-width:72px}
+.mood button.chosen{background:var(--yellow);outline:2px solid #e9c979}
+.stat{background:#fff;border-radius:18px;padding:15px;border:1px solid #f0e8dd}
+.stat strong{display:block;font-size:25px;margin-bottom:4px}
+#room{
+  height:390px;position:relative;overflow:hidden;border-radius:23px;
+  border:2px solid #fff;background:linear-gradient(#dceef5 0%,#eaf4ed 69%,#c6dcb9 69%,#b7d2a7 100%);
+  touch-action:pan-y;isolation:isolate;
+}
+#room.night{background:linear-gradient(#58647f 0%,#858da4 69%,#647d6c 69%,#516c58 100%)}
+#room:before{
+  content:"";position:absolute;left:-30px;top:-48px;width:180px;height:120px;
+  background:#fff9df;border-radius:50%;opacity:.65;
+}
+#room:after{
+  content:"";position:absolute;bottom:0;left:0;right:0;height:20px;
+  background:#a9c898;border-top:3px solid #95b985;z-index:1;
+}
+.window{
+  position:absolute;right:18px;top:17px;width:88px;height:95px;
+  border:5px solid #fff8eb;border-radius:22px;background:#c5e6f4;
+  box-shadow:inset 0 -15px #b8d8ed;
+}
+.night .window{background:#747eaa;box-shadow:inset 0 -15px #626d99}
+.window:before{content:"";position:absolute;left:50%;height:100%;width:4px;background:#fff8eb}
+.window:after{content:"";position:absolute;top:48%;width:100%;height:4px;background:#fff8eb}
+.floor-note{position:absolute;left:13px;top:13px;background:#ffffffbb;border-radius:12px;padding:7px 10px;font-size:11px;z-index:3}
+.pet{
+  position:absolute;width:112px;height:138px;left:20px;top:210px;
+  z-index:4;touch-action:none;user-select:none;cursor:grab;
+}
+.pet:active{cursor:grabbing}
+.pet svg{width:100%;height:100%;overflow:visible;pointer-events:none}
+.pet.walking .pet-art{animation:bob .28s infinite alternate}
+@keyframes bob{to{transform:translateY(-4px) rotate(1deg)}}
+.pet.sleeping .eye-open{display:none}
+.pet.sleeping .eye-closed{display:block}
+.eye-closed{display:none}
+.pet .name{
+  position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);
+  background:#fffdf3;padding:4px 10px;border-radius:20px;font-size:10px;
+  box-shadow:0 3px 7px #756b5720;white-space:nowrap;pointer-events:none;
+}
+.pet .zzz{display:none;position:absolute;right:2px;top:2px;font-weight:bold;color:#fff;font-size:18px}
+.pet.sleeping .zzz{display:block;animation:zzz 1.5s infinite alternate}
+@keyframes zzz{to{transform:translate(5px,-8px);opacity:.5}}
+.snack{
+  position:absolute;width:48px;height:48px;display:grid;place-items:center;
+  background:#fff8e7;border:2px solid white;border-radius:15px;
+  box-shadow:0 4px 10px #69563c20;z-index:7;touch-action:none;cursor:grab;
+  user-select:none;font-size:0;
+}
+.snack svg{width:37px;height:37px;pointer-events:none}
+#toast{
+  position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
+  background:#625d59;color:white;border-radius:20px;padding:11px 17px;
+  font-size:13px;opacity:0;pointer-events:none;transition:.25s;z-index:30;
+  max-width:90%;text-align:center;
+}
+#toast.show{opacity:1}
+.garden{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.plant{
+  background:#f4f1e5;border-radius:17px;padding:12px 4px;text-align:center;
+  min-height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.plant svg{width:45px;height:53px}
+.plant small{font-size:10px;margin-top:5px}
+.memory{border-left:3px solid #e9d6a1;padding:4px 0 4px 12px;margin:14px 0}
+footer{text-align:center;padding:20px;color:#a69c90;font-size:11px}
+@media(min-width:700px){
+  .two{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
+  .pet{width:125px;height:150px}
+}
+@media(max-width:420px){
+  .logo{font-size:20px}.pill{font-size:10px}
+  #room{height:350px}.pet{width:96px;height:125px}
+  .garden{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">my little diary<span>A SOFT LITTLE PLACE FOR YOU</span></div>
+  <div class="pill" id="todayLabel">A little moment ♡</div>
+</header>
+
+<nav>
+  <button class="active" data-page="home">My Corner</button>
+  <button data-page="roomPage">Little Room</button>
+  <button data-page="diaryPage">My Diary</button>
+  <button data-page="gardenPage">Memory Garden</button>
+</nav>
+
+<main>
+<section id="home" class="page active">
+  <div class="hero">
+    <p class="muted" id="greeting">A gentle reminder for today</p>
+    <h1>Make room for<br>your little moments.</h1>
+    <p>Hari ini tak harus sempurna. Kamu boleh istirahat, bertumbuh pelan-pelan, dan menyimpan hal kecil yang berarti untukmu.</p>
+    <button onclick="go('diaryPage')">Write today's diary ↗</button>
+  </div>
+
+  <div class="two">
+    <div class="panel">
+      <h2>How is your heart today?</h2>
+      <p class="muted">Pilih perasaanmu. Semua perasaan boleh ada di sini.</p>
+      <div class="mood" id="moods">
+        <button data-mood="Happy">Happy</button>
+        <button data-mood="Calm">Calm</button>
+        <button data-mood="Tired">Tired</button>
+        <button data-mood="Sad">Sad</button>
+        <button data-mood="Anxious">Anxious</button>
+      </div>
+      <label for="quickNote">A tiny thought</label>
+      <textarea id="quickNote" class="field" placeholder="Apa yang sedang memenuhi pikiranmu?"></textarea>
+      <button onclick="saveQuick()">Save this feeling</button>
+    </div>
+    <div class="panel">
+      <h2>Your little progress</h2>
+      <p class="muted">Bukan tentang seberapa cepat kamu tumbuh, tetapi bahwa kamu terus memberi ruang untuk dirimu sendiri.</p>
+      <div class="row">
+        <div class="stat"><strong id="entryCount">0</strong><span class="muted">diary entries</span></div>
+        <div class="stat"><strong id="streakCount">0</strong><span class="muted">days in a row</span></div>
+      </div>
+      <div style="margin-top:14px" class="stat">
+        <strong id="plantCount">0</strong>
+        <span class="muted">little plants growing in your garden</span>
+      </div>
+      <button style="margin-top:14px" onclick="go('gardenPage')">Visit my garden →</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Memory Jar</h2>
+    <p class="muted">Simpan hal kecil yang ingin kamu ingat. Tidak perlu sesuatu yang besar.</p>
+    <input id="memoryInput" class="field" placeholder="Hari ini aku bersyukur karena...">
+    <button onclick="addMemory()">Put it in the jar</button>
+    <div id="memoryList"></div>
+  </div>
+
+  <div class="panel">
+    <h2>A letter to your future self</h2>
+    <p class="muted">Tuliskan pesan untuk dirimu di masa depan. Pesan ini tersimpan di perangkatmu.</p>
+    <textarea id="futureLetter" class="field" placeholder="Dear future me..."></textarea>
+    <button onclick="saveLetter()">Keep my letter</button>
+    <p class="muted" id="letterStatus"></p>
+  </div>
+</section>
+
+<section id="roomPage" class="page">
+  <div class="panel">
+    <h1>Our little room</h1>
+    <p class="muted">Seret teman kecilmu ke mana pun kamu mau. Lepaskan di udara dan mereka akan jatuh ke lantai. Nyalakan jalan-jalan agar mereka bergerak sendiri.</p>
+    <div id="room">
+      <div class="floor-note" id="roomMessage">A cozy afternoon together</div>
+      <div class="window"></div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button onclick="toggleWalk()" id="walkButton">Let them wander</button>
+      <button onclick="toggleSleep()" id="sleepButton" style="background:#d8d9ef">Sleepy time</button>
+      <button onclick="toggleMusic()" id="musicButton" style="background:#f8dfb5">Play soft music</button>
+    </div>
+    <p class="muted" id="soundStatus" style="margin-top:10px">Suara akan aktif setelah kamu menekan tombol musik atau efek suara.</p>
+  </div>
+
+  <div class="panel">
+    <h2>Snack time</h2>
+    <p class="muted">Pilih camilan, lalu seret makanannya ke tubuh teman kecilmu. Coba dekatkan sampai makanannya menyentuh mereka.</p>
+    <div class="row">
+      <button onclick="spawnSnack('apple')" style="background:#f8d8d2">Apple</button>
+      <button onclick="spawnSnack('cookie')" style="background:#f3dfb6">Cookie</button>
+      <button onclick="spawnSnack('carrot')" style="background:#ffdbb6">Carrot</button>
+    </div>
+    <p class="muted" id="snackStatus" style="margin-top:12px">Pilih camilan untuk memulai.</p>
+  </div>
+
+  <div class="panel">
+    <h2>Meet your companions</h2>
+    <div class="row">
+      <div class="stat"><strong style="font-size:17px">Mochi</strong><span class="muted">The little cat</span></div>
+      <div class="stat"><strong style="font-size:17px">Coco</strong><span class="muted">The calm capybara</span></div>
+      <div class="stat"><strong style="font-size:17px">Ruru</strong><span class="muted">The curious raccoon</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="diaryPage" class="page">
+  <div class="panel">
+    <h1>My diary</h1>
+    <p class="muted">Tidak harus indah atau rapi. Tuliskan saja dengan jujur, untuk dirimu sendiri.</p>
+    <label for="diaryDate">Date</label>
+    <input id="diaryDate" type="date" class="field">
+    <label for="diaryTitle">Title</label>
+    <input id="diaryTitle" class="field" placeholder="A small chapter of my life">
+    <label>Your mood</label>
+    <div class="mood" id="diaryMoods">
+      <button data-mood="Happy">Happy</button><button data-mood="Calm">Calm</button>
+      <button data-mood="Tired">Tired</button><button data-mood="Sad">Sad</button>
+      <button data-mood="Anxious">Anxious</button>
+    </div>
+    <label for="diaryBody">Today's story</label>
+    <textarea id="diaryBody" class="field" style="min-height:170px" placeholder="Hari ini aku merasa..."></textarea>
+    <label for="gratitude">One little thing I'm grateful for</label>
+    <input id="gratitude" class="field" placeholder="Hal sederhana yang berarti hari ini">
+    <label for="song">Today's soundtrack</label>
+    <input id="song" class="field" placeholder="Lagu yang menemani hari ini">
+    <button onclick="saveDiary()">Save my day ♡</button>
+    <button onclick="clearEditor()" style="background:#f1ece5">Clear form</button>
+    <p class="muted" id="diaryStatus" style="margin-top:12px"></p>
+  </div>
+
+  <div class="panel">
+    <h2>Find an old memory</h2>
+    <input id="searchDiary" class="field" placeholder="Cari judul atau kata dalam diary..." oninput="renderEntries()">
+    <div id="entryList"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Take care of your memories</h2>
+    <p class="muted">Buat cadangan catatan sebagai file JSON agar kamu dapat menyimpannya sendiri.</p>
+    <div class="row">
+      <button onclick="exportData()">Export backup</button>
+      <button onclick="document.getElementById('importFile').click()" style="background:#f6dce3">Import backup</button>
+      <input id="importFile" type="file" accept=".json,application/json" hidden onchange="importData(event)">
+    </div>
+    <button onclick="deleteAll()" style="background:#f5d5d1;margin-top:12px">Delete all my data</button>
+  </div>
+</section>
+
+<section id="gardenPage" class="page">
+  <div class="hero">
+    <p class="muted">YOUR GROWING LITTLE WORLD</p>
+    <h1>Memory Garden</h1>
+    <p>Setiap catatan menjadi satu benih kecil. Isi diary-mu dan lihat tamanmu bertambah. Tanaman di sini melambangkan jumlah catatan, bukan penilaian atas dirimu.</p>
+  </div>
+  <div class="panel">
+    <div class="row">
+      <div class="stat"><strong id="gardenEntries">0</strong><span class="muted">memories planted</span></div>
+      <div class="stat"><strong id="gardenMoods">0</strong><span class="muted">moods explored</span></div>
+    </div>
+  </div>
+  <div class="panel">
+    <h2>Your little plants</h2>
+    <p class="muted">Semakin banyak diary yang kamu simpan, semakin banyak tanaman yang tumbuh.</p>
+    <div class="garden" id="garden"></div>
+  </div>
+  <div class="panel">
+    <h2>On this day</h2>
+    <div id="onThisDay" class="muted">Kenangan dari tanggal yang sama akan muncul di sini.</div>
+  </div>
+  <div class="panel">
+    <h2>Your monthly memory book</h2>
+    <p class="muted">Buat versi yang bisa dicetak atau disimpan sebagai PDF melalui menu cetak browser.</p>
+    <button onclick="monthlyBook()">Create memory book</button>
+  </div>
+</section>
+</main>
+<footer>made with a little tenderness · my little diary</footer>
+<div id="toast"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const today=()=>new Date().toLocaleDateString('en-CA');
+const key='littleDiaryCozy_v3';
+let data={entries:[],memories:[],letter:''};
+let selectedMood='',diaryMood='',walkMode=false,sleepMode=false,musicMode=false;
+let audioCtx=null,musicTimer=null,musicStep=0;
+let toastTimer=null;
+
+try{
+ const old=JSON.parse(localStorage.getItem(key)||'null');
+ if(old && Array.isArray(old.entries))data={...data,...old};
+}catch(e){}
+
+$('todayLabel').textContent=new Date().toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});
+$('diaryDate').value=today();
+$('futureLetter').value=data.letter||'';
+$('greeting').textContent=new Date().getHours()<12?'A gentle morning for you':new Date().getHours()<18?'A little afternoon pause':'A soft evening to unwind';
+
+function persist(){
+ try{localStorage.setItem(key,JSON.stringify(data));}
+ catch(e){toast('Penyimpanan penuh. Ekspor backup dan hapus data yang tidak dibutuhkan.');}
+ updateStats();renderEntries();renderMemories();renderGarden();
+}
+function toast(msg){
+ $('toast').textContent=msg;$('toast').classList.add('show');
+ clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),2400);
+}
+function go(id){
+ document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));
+ document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
+ window.scrollTo({top:0,behavior:'smooth'});
+ if(id==='gardenPage')renderGarden();
+}
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
+
+function setupMoodButtons(){
+ document.querySelectorAll('[data-mood]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+   const group=btn.parentElement;
+   group.querySelectorAll('[data-mood]').forEach(b=>b.classList.remove('chosen'));
+   btn.classList.add('chosen');
+   if(group.id==='moods')selectedMood=btn.dataset.mood;
+   else diaryMood=btn.dataset.mood;
+  });
+ });
+}
+setupMoodButtons();
+
+function saveQuick(){
+ if(!selectedMood && !$('quickNote').value.trim()){toast('Pilih mood atau tulis sedikit tentang harimu dulu.');return;}
+ const entry={date:today(),title:'A little thought',mood:selectedMood,body:$('quickNote').value.trim(),gratitude:'',song:'',id:Date.now()};
+ data.entries=data.entries.filter(e=>!(e.date===entry.date&&e.title==='A little thought'));
+ data.entries.push(entry);persist();
+ $('quickNote').value='';toast('Perasaanmu tersimpan dengan lembut ♡');
+}
+function saveDiary(){
+ const date=$('diaryDate').value||today();
+ const title=$('diaryTitle').value.trim()||'A little chapter';
+ const entry={date,title,mood:diaryMood,body:$('diaryBody').value.trim(),gratitude:$('gratitude').value.trim(),song:$('song').value.trim(),id:Date.now()};
+ if(!entry.body&&!entry.gratitude&&!entry.song){toast('Tulis satu hal kecil sebelum menyimpan diary.');return;}
+ const idx=data.entries.findIndex(e=>e.date===date&&e.title===title);
+ if(idx>=0)data.entries[idx]={...data.entries[idx],...entry,id:data.entries[idx].id};
+ else data.entries.push(entry);
+ persist();$('diaryStatus').textContent='Your memory has been saved ♡';
+ toast('Diary berhasil disimpan.');
+}
+function clearEditor(){
+ ['diaryTitle','diaryBody','gratitude','song'].forEach(id=>$(id).value='');
+ diaryMood='';document.querySelectorAll('#diaryMoods [data-mood]').forEach(b=>b.classList.remove('chosen'));
+ $('diaryDate').value=today();$('diaryStatus').textContent='';
+}
+function editEntry(id){
+ const e=data.entries.find(x=>x.id===id);if(!e)return;
+ go('diaryPage');$('diaryDate').value=e.date;$('diaryTitle').value=e.title;
+ $('diaryBody').value=e.body||'';$('gratitude').value=e.gratitude||'';$('song').value=e.song||'';
+ diaryMood=e.mood||'';
+ document.querySelectorAll('#diaryMoods [data-mood]').forEach(b=>b.classList.toggle('chosen',b.dataset.mood===diaryMood));
+ $('diaryStatus').textContent='Editing a saved memory. Save to update it.';
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+function removeEntry(id){
+ if(!confirm('Hapus catatan diary ini?'))return;
+ data.entries=data.entries.filter(e=>e.id!==id);persist();toast('Catatan dihapus.');
+}
+function renderEntries(){
+ const q=($('searchDiary')?.value||'').toLowerCase();
+ const items=[...data.entries].sort((a,b)=>b.date.localeCompare(a.date))
+ .filter(e=>(e.title+' '+e.body+' '+e.gratitude+' '+e.song+' '+e.mood).toLowerCase().includes(q));
+ $('entryList').innerHTML=items.length?items.map(e=>`
+ <div class="memory">
+ <strong>${esc(e.title)}</strong><div class="muted">${esc(e.date)} · ${esc(e.mood||'No mood')}</div>
+ <p style="white-space:pre-wrap;margin:8px 0">${esc((e.body||e.gratitude||'A quiet little memory').slice(0,230))}</p>
+ ${e.song?`<div class="muted">Soundtrack: ${esc(e.song)}</div>`:''}
+ <div class="row" style="margin-top:8px">
+ <button onclick="editEntry(${Number(e.id)})">Edit</button>
+ <button onclick="removeEntry(${Number(e.id)})" style="background:#f6dce3">Delete</button>
+ </div></div>`).join(''):'<p class="muted">Belum ada catatan yang cocok. Mulailah dari satu momen kecil.</p>';
+}
+function addMemory(){
+ const text=$('memoryInput').value.trim();if(!text){toast('Tulis kenangan kecilmu dulu.');return;}
+ data.memories.unshift({text,date:today(),id:Date.now()});$('memoryInput').value='';persist();toast('Satu kenangan masuk ke dalam jar.');
+}
+function removeMemory(id){data.memories=data.memories.filter(m=>m.id!==id);persist();}
+function renderMemories(){
+ $('memoryList').innerHTML=data.memories.map(m=>`<div class="memory"><div>${esc(m.text)}</div><small class="muted">${esc(m.date)}</small> <button onclick="removeMemory(${Number(m.id)})" style="padding:4px 8px;background:#f6dce3">×</button></div>`).join('');
+}
+function saveLetter(){data.letter=$('futureLetter').value;persist();$('letterStatus').textContent='Your letter is safe in this browser ♡';toast('Suratmu tersimpan.');}
+function updateStats(){
+ $('entryCount').textContent=data.entries.length;
+ $('plantCount').textContent=data.entries.length;
+ $('gardenEntries').textContent=data.entries.length;
+ $('gardenMoods').textContent=new Set(data.entries.map(e=>e.mood).filter(Boolean)).size;
+ const days=[...new Set(data.entries.map(e=>e.date))].sort().reverse();
+ let streak=0,d=new Date();d.setHours(0,0,0,0);
+ if(days[0]===today()||days[0]===new Date(d.getTime()-86400000).toLocaleDateString('en-CA')){
+  for(let i=0;i<days.length;i++){
+   const expected=new Date(d.getTime()-i*86400000).toLocaleDateString('en-CA');
+   if(days.includes(expected))streak++;else break;
+  }
+ }
+ $('streakCount').textContent=streak;
+}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+function plantSVG(n){
+ const flower=['#f6cbd5','#f7dca0','#c5dff2','#d9c9ed','#f4c9a6'][n%5];
+ const leaf=['#9fbd8d','#b4cfa1','#89b89e'][n%3];
+ return `<svg viewBox="0 0 60 68" aria-hidden="true">
+ <path d="M30 63 Q29 47 30 30" stroke="#789b71" stroke-width="3" fill="none" stroke-linecap="round"/>
+ <path d="M29 49 Q12 48 13 35 Q27 34 29 49" fill="${leaf}"/>
+ <path d="M30 43 Q46 43 48 29 Q34 28 30 43" fill="${leaf}"/>
+ ${n%4===0?`<path d="M30 31 Q8 24 17 11 Q28 8 30 31 M30 31 Q29 7 42 9 Q52 21 30 31 M30 31 Q48 20 52 34 Q45 45 30 31 M30 31 Q11 44 7 30 Q12 19 30 31" fill="${flower}"/>`:`<circle cx="30" cy="25" r="${8+n%3}" fill="${flower}"/>
+ <circle cx="30" cy="12" r="6" fill="${flower}"/><circle cx="43" cy="25" r="6" fill="${flower}"/><circle cx="30" cy="38" r="6" fill="${flower}"/><circle cx="17" cy="25" r="6" fill="${flower}"/>`}
+ <circle cx="30" cy="25" r="5" fill="#f4d477"/>
+ </svg>`;
+}
+function renderGarden(){
+ const count=data.entries.length;
+ const display=Math.min(48,Math.max(8,count));
+ $('garden').innerHTML=Array.from({length:display},(_,i)=>{
+  const grown=i<count;
+  return `<div class="plant" style="opacity:${grown?1:.48}">${plantSVG(i)}<small>${grown?'Memory '+(i+1):'Future seed'}</small></div>`;
+ }).join('');
+ const todayMonth=today().slice(0,7);
+ const sameDay=data.entries.filter(e=>e.date.slice(5)===today().slice(5));
+ $('onThisDay').innerHTML=sameDay.length?sameDay.map(e=>`<div class="memory"><strong>${esc(e.title)}</strong><p>${esc(e.date)} · ${esc(e.body||e.gratitude||'A little memory from this day.')}</p></div>`).join(''):'Belum ada kenangan pada tanggal ini. Nanti, saat kamu menulis diary di tanggal yang sama, kenanganmu akan muncul di sini.';
+}
+function exportData(){
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+ const url=URL.createObjectURL(blob);const a=document.createElement('a');
+ a.href=url;a.download='my-little-diary-backup.json';a.click();URL.revokeObjectURL(url);
+}
+function importData(ev){
+ const file=ev.target.files[0];if(!file)return;
+ const reader=new FileReader();
+ reader.onload=()=>{
+  try{
+   const d=JSON.parse(reader.result);
+   if(!Array.isArray(d.entries)||!Array.isArray(d.memories))throw Error();
+   if(confirm('Impor backup? Data diary saat ini akan diganti.')){
+    data={entries:d.entries,memories:d.memories,letter:d.letter||''};
+    $('futureLetter').value=data.letter;persist();toast('Backup berhasil diimpor.');
+   }
+  }catch(e){toast('File backup tidak valid.');}
+  ev.target.value='';
+ };
+ reader.readAsText(file);
+}
+function deleteAll(){
+ if(!confirm('Hapus semua diary, memory jar, dan surat? Tindakan ini tidak bisa dibatalkan.'))return;
+ if(!confirm('Yakin ingin menghapus semuanya? Sebaiknya ekspor backup dulu.'))return;
+ data={entries:[],memories:[],letter:''};$('futureLetter').value='';persist();clearEditor();toast('Data lokal telah dihapus.');
+}
+function monthlyBook(){
+ const month=today().slice(0,7);
+ const entries=data.entries.filter(e=>e.date.startsWith(month)).sort((a,b)=>a.date.localeCompare(b.date));
+ const html=`<!doctype html><html lang="id"><meta charset="utf-8"><title>My Memory Book</title>
+ <style>body{font-family:Georgia,serif;max-width:720px;margin:40px auto;padding:20px;color:#625d59;line-height:1.7}h1{color:#7c9ba9}.entry{border-bottom:1px solid #ddd;padding:16px 0;white-space:pre-wrap}@media print{button{display:none}}</style>
+ <h1>My Little Memory Book</h1><p>${esc(month)} · ${entries.length} little memories</p>
+ ${entries.map(e=>`<div class="entry"><h2>${esc(e.title)}</h2><small>${esc(e.date)} · ${esc(e.mood||'')}</small><p>${esc(e.body||'')}</p><p>${e.gratitude?'Grateful for: '+esc(e.gratitude):''}</p><p>${e.song?'Soundtrack: '+esc(e.song):''}</p></div>`).join('')||'<p>Belum ada diary untuk bulan ini.</p>'}
+ <p>Made with a little tenderness.</p><button onclick="print()">Print / Save as PDF</button></html>`;
+ const w=window.open('','_blank');
+ if(!w){toast('Popup diblokir. Izinkan popup untuk membuat memory book.');return;}
+ w.document.open();w.document.write(html);w.document.close();
+}
+
+// --- Custom full-body companion illustrations ---
+const petDefs=[
+ {id:'mochi',name:'Mochi',kind:'cat',color:'#f1c6a5',ear:'#d99f89',x:18,y:0},
+ {id:'coco',name:'Coco',kind:'capybara',color:'#c99c73',ear:'#a97856',x:145,y:0},
+ {id:'ruru',name:'Ruru',kind:'raccoon',color:'#aeb9c5',ear:'#778493',x:275,y:0}
+];
+function art(p){
+ const cat=p.kind==='cat',cap=p.kind==='capybara';
+ let ears=cat?`<path d="M25 40 L29 8 L51 31 M64 30 L86 8 L89 42" fill="${p.color}" stroke="#a77d66" stroke-width="2" stroke-linejoin="round"/><path d="M34 29 L35 17 L45 30 M70 29 L81 17 L79 31" fill="#edb5b2"/>`:
+ cap?`<path d="M34 36 Q22 15 35 20 Q49 21 49 36 M66 36 Q64 20 78 21 Q88 25 78 38" fill="${p.ear}" stroke="#9b7556" stroke-width="2"/>`:
+ `<path d="M24 39 L29 9 L52 30 M64 30 L86 9 L91 39" fill="${p.color}" stroke="#758493" stroke-width="2"/><path d="M34 29 L35 17 L45 29 M71 29 L82 17 L79 30" fill="#d7a9ad"/>`;
+ const face=cap?`<ellipse cx="57" cy="47" rx="30" ry="26" fill="${p.color}"/><ellipse cx="57" cy="57" rx="20" ry="13" fill="#e8c8a9"/>`:
+ cat?`<circle cx="57" cy="46" r="31" fill="${p.color}"/><ellipse cx="57" cy="57" rx="20" ry="13" fill="#fff0df"/>`:
+ `<circle cx="57" cy="46" r="31" fill="${p.color}"/><path d="M31 40 Q57 25 83 40 L80 51 Q57 41 34 51Z" fill="#6d7783"/><ellipse cx="57" cy="57" rx="20" ry="13" fill="#f5e7d7"/>`;
+ const tail=cat?`<path d="M76 104 Q111 91 96 73 Q88 66 85 80" fill="none" stroke="${p.color}" stroke-width="11" stroke-linecap="round"/>`:
+ cap?`<path d="M75 105 Q100 109 96 89" fill="none" stroke="${p.color}" stroke-width="9" stroke-linecap="round"/>`:
+ `<path d="M76 103 Q102 111 99 87 Q96 77 84 85" fill="none" stroke="#778493" stroke-width="13" stroke-linecap="round"/><path d="M86 100 L96 100" stroke="#e9e7e0" stroke-width="5"/>`;
+ return `<svg viewBox="0 0 115 145" aria-label="${p.name}">
+ <g class="pet-art">
+ ${tail}
+ <ellipse cx="57" cy="119" rx="31" ry="7" fill="#75886b" opacity=".15"/>
+ <path d="M37 92 Q28 110 35 127 Q41 133 47 127 L50 106 M66 106 L69 126 Q77 132 82 126 L79 94" fill="${p.color}" stroke="#b28c70" stroke-width="1.4"/>
+ <ellipse cx="57" cy="86" rx="27" ry="31" fill="${p.color}" stroke="#b28c70" stroke-width="1.4"/>
+ <path d="M42 109 Q57 116 72 109" fill="none" stroke="#d6a78c" stroke-width="2" stroke-linecap="round"/>
+ ${ears}${face}
+ <g class="eye-open">
+ <ellipse cx="45" cy="46" rx="3" ry="4" fill="#534942"/><ellipse cx="69" cy="46" rx="3" ry="4" fill="#534942"/>
+ <circle cx="46" cy="45" r="1" fill="white"/><circle cx="70" cy="45" r="1" fill="white"/>
+ </g>
+ <g class="eye-closed" fill="none" stroke="#534942" stroke-width="2.5" stroke-linecap="round">
+ <path d="M39 47 Q45 53 51 47"/><path d="M63 47 Q69 53 75 47"/>
+ </g>
+ <ellipse cx="34" cy="56" rx="6" ry="3" fill="#e99f9c" opacity=".7"/><ellipse cx="80" cy="56" rx="6" ry="3" fill="#e99f9c" opacity=".7"/>
+ <path d="M53 57 Q57 61 61 57" fill="none" stroke="#76584b" stroke-width="2" stroke-linecap="round"/>
+ <path d="M47 68 Q57 74 67 68" fill="none" stroke="#76584b" stroke-width="2" stroke-linecap="round"/>
+ <ellipse cx="31" cy="127" rx="10" ry="5" fill="${p.color}"/><ellipse cx="76" cy="127" rx="10" ry="5" fill="${p.color}"/>
+ </g></svg>`;
+}
+const room=$('room');
+let pets=[];
+function buildPets(){
+ petDefs.forEach((p,i)=>{
+  const el=document.createElement('div');el.className='pet';el.id=p.id;
+  el.innerHTML=art(p)+`<div class="name">${p.name}</div><div class="zzz">Z z</div>`;
+  room.appendChild(el);
+  const obj={...p,el,x:20+i*120,y:room.clientHeight-150,vx:0,vy:0,drag:false,offsetX:0,offsetY:0,last:0};
+  pets.push(obj);
+  el.addEventListener('pointerdown',e=>startPetDrag(e,obj));
+ });
+ placePets();requestAnimationFrame(physics);
+}
+function placePets(){
+ pets.forEach((p,i)=>{
+  p.x=Math.min(20+i*120,Math.max(0,room.clientWidth-105));
+  p.y=Math.min(p.y,room.clientHeight-145);
+  p.el.style.left=p.x+'px';p.el.style.top=p.y+'px';
+ });
+}
+let draggingPet=null;
+function startPetDrag(e,p){
+ if(sleepMode)return;
+ e.preventDefault();draggingPet=p;p.drag=true;p.vx=0;p.vy=0;
+ const r=p.el.getBoundingClientRect();p.offsetX=e.clientX-r.left;p.offsetY=e.clientY-r.top;
+ p.el.setPointerCapture(e.pointerId);
+}
+document.addEventListener('pointermove',e=>{
+ if(!draggingPet)return;
+ const p=draggingPet,r=room.getBoundingClientRect();
+ p.x=e.clientX-r.left-p.offsetX;p.y=e.clientY-r.top-p.offsetY;
+ p.x=Math.max(0,Math.min(room.clientWidth-p.el.offsetWidth,p.x));
+ p.y=Math.max(0,Math.min(room.clientHeight-p.el.offsetHeight,p.y));
+ p.el.style.left=p.x+'px';p.el.style.top=p.y+'px';
+});
+document.addEventListener('pointerup',()=>{
+ if(draggingPet){draggingPet.drag=false;draggingPet.vy=1;draggingPet=null;}
+});
+function physics(){
+ const floor=room.clientHeight-140;
+ pets.forEach(p=>{
+  if(!p.drag){
+   if(walkMode&&!sleepMode&&Math.random()<.025)p.vx=(Math.random()-.5)*2.2;
+   p.x+=p.vx;p.vy+=.35;p.y+=p.vy;
+   if(p.y>floor){p.y=floor;p.vy=0;}
+   if(p.x<0){p.x=0;p.vx=Math.abs(p.vx)*.8}
+   if(p.x>room.clientWidth-p.el.offsetWidth){p.x=room.clientWidth-p.el.offsetWidth;p.vx=-Math.abs(p.vx)*.8}
+   if(Math.abs(p.vx)>.1)p.vx*=.985;
+   p.el.style.left=p.x+'px';p.el.style.top=p.y+'px';
+   p.el.classList.toggle('walking',walkMode&&!sleepMode&&Math.abs(p.vx)>.3);
+   p.el.querySelector('.pet-art').style.transform=p.vx<-.1?'scaleX(-1)':'scaleX(1)';
+  }
+ });
+ requestAnimationFrame(physics);
+}
+function toggleWalk(){
+ walkMode=!walkMode;
+ $('walkButton').textContent=walkMode?'Pause their walk':'Let them wander';
+ if(walkMode&&!sleepMode)pets.forEach((p,i)=>p.vx=i%2?1.1:-1.1);
+ else pets.forEach(p=>p.vx=0);
+}
+function toggleSleep(){
+ sleepMode=!sleepMode;room.classList.toggle('night',sleepMode);
+ pets.forEach(p=>{p.el.classList.toggle('sleeping',sleepMode);p.vx=0;});
+ $('sleepButton').textContent=sleepMode?'Wake them gently':'Sleepy time';
+ $('roomMessage').textContent=sleepMode?'A quiet little night':'A cozy afternoon together';
+ if(sleepMode&&musicMode)toggleMusic();
+ if(sleepMode){walkMode=false;$('walkButton').textContent='Let them wander';}
+ toast(sleepMode?'Shhh... everyone is sleeping.':'Good morning, little friends!');
+}
+function audio(){
+ if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+ if(audioCtx.state==='suspended')audioCtx.resume();
+ return audioCtx;
+}
+function tone(freq=520,dur=.12,type='sine',vol=.045){
+ try{
+  const c=audio(),o=c.createOscillator(),g=c.createGain();
+  o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(vol,c.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001,c.currentTime+dur);
+  o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+dur);
+ }catch(e){}
+}
+function toggleMusic(){
+ if(musicMode){
+  musicMode=false;clearInterval(musicTimer);musicTimer=null;
+  $('musicButton').textContent='Play soft music';$('soundStatus').textContent='Musik dihentikan.';
+  return;
+ }
+ if(sleepMode){toast('Bangunkan temanmu untuk memutar musik.');return;}
+ musicMode=true;musicStep=0;audio();
+ $('musicButton').textContent='Stop soft music';
+ $('soundStatus').textContent='Melodi lembut sedang dimainkan.';
+ const notes=[523.25,659.25,783.99,659.25,587.33,698.46,880,698.46];
+ musicTimer=setInterval(()=>{if(musicMode){tone(notes[musicStep%notes.length],.42,'sine',.018);musicStep++;}},500);
+}
+function spawnSnack(kind){
+ if(sleepMode){toast('Temanmu sedang tidur. Bangunkan mereka dulu.');return;}
+ const foods={
+ apple:`<svg viewBox="0 0 40 40"><path d="M20 12 Q16 3 23 4" fill="none" stroke="#795a3e" stroke-width="3" stroke-linecap="round"/><path d="M21 8 Q30 2 33 9 Q26 15 21 8" fill="#94b982"/><path d="M20 12 C5 5 2 19 9 31 Q15 40 21 34 Q30 41 35 28 C41 13 30 7 20 12Z" fill="#ef8e86"/><path d="M20 14 Q17 10 14 13" fill="none" stroke="#ffd6c7" stroke-width="2"/></svg>`,
+ cookie:`<svg viewBox="0 0 40 40"><circle cx="20" cy="21" r="15" fill="#dfb17d"/><circle cx="13" cy="14" r="2.5" fill="#8b6348"/><circle cx="25" cy="13" r="2" fill="#8b6348"/><circle cx="27" cy="25" r="3" fill="#8b6348"/><circle cx="15" cy="28" r="2" fill="#8b6348"/><circle cx="20" cy="20" r="2" fill="#8b6348"/></svg>`,
+ carrot:`<svg viewBox="0 0 40 40"><path d="M19 10 Q10 1 10 8 Q15 16 20 14 M20 12 Q22 1 28 6 Q29 12 20 15" fill="#8ab98c"/><path d="M12 13 Q27 7 29 17 L17 36 Q13 37 14 28Z" fill="#f2a45e"/><path d="M17 19 L23 17 M17 25 L20 23" stroke="#d98146" stroke-width="1.5"/></svg>`
+ };
+ const el=document.createElement('div');el.className='snack';el.innerHTML=foods[kind];el.dataset.kind=kind;
+ el.style.left=Math.max(5,room.clientWidth/2-24)+'px';el.style.top='18px';room.appendChild(el);
+ const s={el,kind,x:parseFloat(el.style.left),y:18,vx:0,vy:0,drag:true,ox:24,oy:24};
+ snacks.push(s);el.setPointerCapture?.bind(el);
+ el.addEventListener('pointerdown',e=>{
+  e.preventDefault();s.drag=true;s.vy=0;snackDragging=s;
+  const r=el.getBoundingClientRect();s.ox=e.clientX-r.left;s.oy=e.clientY-r.top;
+  el.setPointerCapture(e.pointerId);
+ });
+ $('snackStatus').textContent='Seret camilan ke salah satu teman kecilmu.';
+ tone(660,.1);
+}
+let snacks=[],snackDragging=null;
+document.addEventListener('pointermove',e=>{
+ if(!snackDragging)return;
+ const s=snackDragging,r=room.getBoundingClientRect();
+ s.x=e.clientX-r.left-s.ox;s.y=e.clientY-r.top-s.oy;
+ s.x=Math.max(0,Math.min(room.clientWidth-48,s.x));s.y=Math.max(0,Math.min(room.clientHeight-48,s.y));
+ s.el.style.left=s.x+'px';s.el.style.top=s.y+'px';
+});
+document.addEventListener('pointerup',()=>{
+ if(!snackDragging)return;
+ const s=snackDragging;s.drag=false;
+ const target=pets.find(p=>s.x+24>p.x+8&&s.x+24<p.x+p.el.offsetWidth-8&&s.y+24>p.y+8&&s.y+24<p.y+p.el.offsetHeight-8);
+ if(target){
+  s.el.remove();snacks=snacks.filter(x=>x!==s);
+  target.el.animate([{transform:'scale(1)'},{transform:'scale(1.1) rotate(-4deg)'},{transform:'scale(1)'}],{duration:350});
+  $('snackStatus').textContent=target.name+' enjoyed the snack. What a sweet little moment!';
+  tone(740,.12);setTimeout(()=>tone(930,.16),100);
+ }else{
+  s.vy=1;$('snackStatus').textContent='Coba dekatkan camilan sampai menyentuh teman kecilmu.';
+ }
+ snackDragging=null;
+});
+function snackPhysics(){
+ snacks.forEach(s=>{
+  if(!s.drag){
+   s.vy+=.3;s.y+=s.vy;
+   if(s.y>room.clientHeight-48){s.y=room.clientHeight-48;s.vy=0;}
+   s.el.style.top=s.y+'px';
+  }
+ });
+ requestAnimationFrame(snackPhysics);
+}
+requestAnimationFrame(snackPhysics);
+window.addEventListener('resize',placePets);
+
+buildPets();persist();renderEntries();renderMemories();renderGarden();
+</script>
+</body>
+</html>
